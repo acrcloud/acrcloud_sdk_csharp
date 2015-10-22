@@ -142,7 +142,7 @@ class ACRCloudExtrTool {
 
 # Example
 ACRCloudRecognitionTest is a VS2010 Project.<br>
-You can replace "XXXXXXXX" below with your project's access_key and access_secret, and run it.
+You need to replace "XXXXXXXX" below with your project's access_key and access_secret, and run it.
 ```c
 void Main(string[] args)
     {

@@ -1,0 +1,5 @@
+\\mac\home\Documents\Visual Studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\bin\Debug\ACRCloudRecognitionTest.exe
+\\mac\home\Documents\Visual Studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\bin\Debug\ACRCloudRecognitionTest.pdb
+\\mac\home\Documents\Visual Studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\obj\x86\Debug\ACRCloudRecognitionTest.exe
+\\mac\home\Documents\Visual Studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\obj\x86\Debug\ACRCloudRecognitionTest.pdb
+\\mac\home\documents\visual studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\obj\x86\Debug\ACRCloudRecognitionTest.csprojResolveAssemblyReference.cache

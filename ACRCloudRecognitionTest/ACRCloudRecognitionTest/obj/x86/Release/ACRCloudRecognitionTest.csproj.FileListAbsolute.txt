@@ -1,0 +1,4 @@
+\\mac\home\documents\visual studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\bin\Release\ACRCloudRecognitionTest.exe
+\\mac\home\documents\visual studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\bin\Release\ACRCloudRecognitionTest.pdb
+\\mac\home\documents\visual studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\obj\x86\Release\ACRCloudRecognitionTest.exe
+\\mac\home\documents\visual studio 2010\Projects\ACRCloudRecognitionTest\ACRCloudRecognitionTest\obj\x86\Release\ACRCloudRecognitionTest.pdb

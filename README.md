@@ -1,5 +1,6 @@
 # acrcloud_sdk_CSharp
 Create "ACRCloud Fingerprint" by Audio/Video file, and use "ACRCloud Fingerprint" to recognize metainfos by "ACRCloud webapi".<br>
+If you are developing C++ project, also can use "libacrcloud_extr_tool.dll"
 
 # ACRCloud
 Docs: [https://docs.acrcloud.com/](https://docs.acrcloud.com/)<br>

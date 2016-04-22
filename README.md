@@ -5,13 +5,13 @@
 >>>>Video: mp4, mkv, wmv, flv, ts, avi ...
 
 # ACRCloud
-Docs: [https://docs.acrcloud.com/](https://docs.acrcloud.com/)<br>
+Docs: [https://www.acrcloud.com/docs/](https://www.acrcloud.com/docs/)<br>
 Console: [https://console.acrcloud.com/](https://console.acrcloud.com/)
 
 # Windows Runtime Library 
 **If you run the SDK on Windows, you must install this library.**<br>
-X86: [download and install Library](https://www.microsoft.com/en-us/download/details.aspx?id=5555)<br>
-x64: [download and install Library](https://www.microsoft.com/en-us/download/details.aspx?id=14632)
+X86: [download and install Library(vcredist_x86.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=5555)<br>
+x64: [download and install Library(vcredist_x64.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=14632)
 
 # Note
 1. You must not modify package name "com.acrcloud.utils".<br>

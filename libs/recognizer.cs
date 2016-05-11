@@ -299,7 +299,7 @@ namespace ACRCloudRecognitionTest
         public String RecognizeByFile(String filePath, int startSeconds)
         {
             byte[] fp = this.acrTool.CreateFingerprintByFile(filePath, startSeconds, 12, false);
-            Debug.WriteLine(fp.Length);
+            //Debug.WriteLine(fp.Length);
             if (fp == null)
             {
                 return "";

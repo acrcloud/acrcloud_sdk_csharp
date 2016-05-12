@@ -93,7 +93,7 @@ namespace ACRCloudRecognitionTest
             }
             byte tIsDB = (isDB) ? (byte)1 : (byte)0;
             IntPtr pFpBuffer = IntPtr.Zero;
-            int fpBufferLen = create_fingerprint_by_file(Encoding.UTF8.GetBytes(filePath), startTimeSeconds, audioLenSeconds, tIsDB, ref pFpBuffer);
+            int fpBufferLen = create_fingerprint_by_file(filePath, startTimeSeconds, audioLenSeconds, tIsDB, ref pFpBuffer);
             if (fpBufferLen <= 0)
             {
                 return fpBuffer;
@@ -166,7 +166,7 @@ namespace ACRCloudRecognitionTest
                 return audioBuffer;
             }
             IntPtr pAudioBuffer = IntPtr.Zero;
-            int fpBufferLen = decode_audio_by_file(Encoding.UTF8.GetBytes(filePath), startTimeSeconds, audioLenSeconds, ref pAudioBuffer);
+            int fpBufferLen = decode_audio_by_file(filePath, startTimeSeconds, audioLenSeconds, ref pAudioBuffer);
             if (fpBufferLen <= 0)
             {
                 return audioBuffer;
@@ -219,11 +219,11 @@ namespace ACRCloudRecognitionTest
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern int create_fingerprint(byte[] pcm_buffer, int pcm_buffer_len, byte is_db_fingerprint, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
-        private static extern int create_fingerprint_by_file(byte[] file_path, int start_time_seconds, int audio_len_seconds, byte is_db_fingerprint, ref IntPtr fps_buffer);
+        private static extern int create_fingerprint_by_file(string file_path, int start_time_seconds, int audio_len_seconds, byte is_db_fingerprint, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern int create_fingerprint_by_filebuffer(byte[] file_buffer, int file_buffer_len, int start_time_seconds, int audio_len_seconds, byte is_db_fingerprint, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
-        private static extern int decode_audio_by_file(byte[] file_path, int start_time_seconds, int audio_len_seconds, ref IntPtr audio_buffer);
+        private static extern int decode_audio_by_file(string file_path, int start_time_seconds, int audio_len_seconds, ref IntPtr audio_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern int decode_audio_by_filebuffer(byte[] file_buffer, int file_buffer_len, int start_time_seconds, int audio_len_seconds, ref IntPtr audio_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
@@ -296,7 +296,7 @@ namespace ACRCloudRecognitionTest
           *  @return result 
           *
           **/
-        public String RecognizeByFile(String filePath, int startSeconds)
+        public String RecognizeByFile(string filePath, int startSeconds)
         {
             byte[] fp = this.acrTool.CreateFingerprintByFile(filePath, startSeconds, 12, false);
             //Debug.WriteLine(fp.Length);

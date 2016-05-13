@@ -1,27 +1,33 @@
-# Overview
-  [ACRCloud](https://www.acrcloud.com/) provides cloud ACR services to help excellent companies and developers build Audio Fingerprinting based applications such as **Audio Recognition** (supports music, video, ads for both online and offline), **Broadcast Monitoring**, **Second Screen Interaction**, **Copyright Detection** and etc.<br>
-  This java SDK can recognize ACRCloud by most of audio/video file. create "ACRCloud Fingerprint" by Audio/Video file, and use "ACRCloud Fingerprint" to recognize metainfos by "ACRCloud webapi".<br>
->>>>Audio: mp3, wav, m4a, flac, aac, amr, ape, ogg ...<br>
->>>>Video: mp4, mkv, wmv, flv, ts, avi ...
+# Audio Recognition C# SDK
 
-# ACRCloud
-Docs: [https://www.acrcloud.com/docs/](https://www.acrcloud.com/docs/)<br>
-Console: [https://console.acrcloud.com/](https://console.acrcloud.com/)
+## Overview
+  [ACRCloud](https://www.acrcloud.com/) provides [Automatic Content Recognition](https://www.acrcloud.com/docs/introduction/automatic-content-recognition/) services for [Audio Fingerprinting](https://www.acrcloud.com/docs/introduction/audio-fingerprinting/) based applications such as **[Audio Recognition](https://www.acrcloud.com/music-recognition)** (supports music, video, ads for both online and offline), **[Broadcast Monitoring](https://www.acrcloud.com/broadcast-monitoring)**, **[Second Screen](https://www.acrcloud.com/second-screen-synchronization)**, **[Copyright Protection](https://www.acrcloud.com/copyright-protection-de-duplication)** and etc.<br>
+  
+  This **audio recognition C# SDK** support most of audio / video files. 
 
-# Windows Runtime Library 
+>>Audio: mp3, wav, m4a, flac, aac, amr, ape, ogg ...<br>
+>>Video: mp4, mkv, wmv, flv, ts, avi ...
+
+## Requirements
+Follow the tutorials to create a project and get your host, access_key and access_secret.
+
+ * [How to identify songs by sound](https://www.acrcloud.com/docs/tutorials/identify-music-by-sound/)
+ 
+ * [How to detect custom audio content by sound](https://www.acrcloud.com/docs/tutorials/identify-audio-custom-content/)
+ 
+## Windows Runtime Library 
 **If you run the SDK on Windows, you must install this library.**<br>
 X86: [download and install Library(vcredist_x86.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=5555)<br>
 x64: [download and install Library(vcredist_x64.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=14632)
 
-# Note
+## Note
 1. You must not modify package name "com.acrcloud.utils".<br>
 2. If you run the SDK on Windows, you must install library(vcredist).
 3. If you are developing C++ project, also can use "libacrcloud_extr_tool.dll"
 
-
-# Functions
+## Functions
 Introduction all API.
-## recognizer.cs
+### recognizer.cs
 ```c
 class ACRCloudRecognizer
 {
@@ -149,7 +155,7 @@ class ACRCloudExtrTool {
   
 ```
 
-# Example
+## Example
 ACRCloudRecognitionTest is a VS2010 Project.<br>
 You need to replace "XXXXXXXX" below with your project's access_key and access_secret, and run it.
 ```c

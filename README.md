@@ -157,12 +157,12 @@ class ACRCloudExtrTool {
 
 ## Example
 ACRCloudRecognitionTest is a VS2010 Project.<br>
-You need to replace "XXXXXXXX" below with your project's access_key and access_secret, and run it.
+You need to replace "XXXXXXXX" below with your project's host, access_key and access_secret, and run it.
 ```c
 void Main(string[] args)
     {
         var config = new Dictionary<string, object>();
-        config.Add("host", "ap-southeast-1.api.acrcloud.com");
+        config.Add("host", "XXXXXXX");
         config.Add("access_key", "XXXXXXXX");
         config.Add("access_secret", "XXXXXXXX");
         config.Add("timeout", 10); // seconds

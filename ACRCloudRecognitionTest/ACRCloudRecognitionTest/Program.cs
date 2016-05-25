@@ -479,8 +479,8 @@ namespace ACRCloudRecognitionTest
         static void Main(string[] args)
         {
             var config = new Dictionary<string, object>();
-            config.Add("host", "ap-southeast-1.api.acrcloud.com");
-            // Replace "XXXXXXXX" below with your project's access_key and access_secret
+            // Replace "XXXXXXXX" below with your project's host, access_key and access_secret
+            config.Add("host", "XXXXXXX");
             config.Add("access_key", "XXXXXXXX");
             config.Add("access_secret", "XXXXXXXX");
             config.Add("timeout", 10); // seconds

@@ -1,6 +1,6 @@
 ﻿/*
    @author qinxue.pan E-mail: xue@acrcloud.com
-   @version 1.0.0
+   @version 1.0.1
    @create 2015.10.01 
  
 Copyright 2015 ACRCloud Recognizer v1.0.0
@@ -67,6 +67,7 @@ namespace ACRCloudRecognitionTest
             fpBuffer = new byte[fpBufferLen];
             Marshal.Copy(pFpBuffer, fpBuffer, 0, fpBufferLen);
             acr_free(pFpBuffer);
+
             return fpBuffer;
         }
 
@@ -87,14 +88,18 @@ namespace ACRCloudRecognitionTest
         public byte[] CreateFingerprintByFile(string filePath, int startTimeSeconds, int audioLenSeconds, bool isDB)
         {
             byte[] fpBuffer = null;
-            if (!File.Exists(filePath))
-            {
-                return fpBuffer;
-            }
+
             byte tIsDB = (isDB) ? (byte)1 : (byte)0;
             IntPtr pFpBuffer = IntPtr.Zero;
             int fpBufferLen = create_fingerprint_by_file(filePath, startTimeSeconds, audioLenSeconds, tIsDB, ref pFpBuffer);
-            if (fpBufferLen <= 0)
+            switch (fpBufferLen)
+            {
+                case -1:
+                    throw new Exception(filePath + " is not readable!");
+                case -2:
+                    throw new Exception(filePath + " can not decode audio data!");
+            }
+            if (fpBufferLen == 0)
             {
                 return fpBuffer;
             }
@@ -102,6 +107,7 @@ namespace ACRCloudRecognitionTest
             fpBuffer = new byte[fpBufferLen];
             Marshal.Copy(pFpBuffer, fpBuffer, 0, fpBufferLen);
             acr_free(pFpBuffer);
+
             return fpBuffer;
         }
 
@@ -123,18 +129,22 @@ namespace ACRCloudRecognitionTest
         public byte[] CreateFingerprintByFileBuffer(byte[] fileBuffer, int fileBufferLen, int startTimeSeconds, int audioLenSeconds, bool isDB)
         {
             byte[] fpBuffer = null;
-            if (fileBuffer == null || fileBufferLen <= 0)
-            {
-                return fpBuffer;
-            }
             if (fileBufferLen > fileBuffer.Length)
             {
                 fileBufferLen = fileBuffer.Length;
             }
+
             byte tIsDB = (isDB) ? (byte)1 : (byte)0;
             IntPtr pFpBuffer = IntPtr.Zero;
             int fpBufferLen = create_fingerprint_by_filebuffer(fileBuffer, fileBufferLen, startTimeSeconds, audioLenSeconds, tIsDB, ref pFpBuffer);
-            if (fpBufferLen <= 0)
+            switch (fpBufferLen)
+            {
+                case -1:
+                    throw new Exception("fileBuffer is not audio/video data!");
+                case -2:
+                    throw new Exception("fileBuffer can not decode audio data!");
+            }
+            if (fpBufferLen == 0)
             {
                 return fpBuffer;
             }
@@ -161,13 +171,17 @@ namespace ACRCloudRecognitionTest
         public byte[] DecodeAudioByFile(string filePath, int startTimeSeconds, int audioLenSeconds)
         {
             byte[] audioBuffer = null;
-            if (!File.Exists(filePath))
-            {
-                return audioBuffer;
-            }
+
             IntPtr pAudioBuffer = IntPtr.Zero;
             int fpBufferLen = decode_audio_by_file(filePath, startTimeSeconds, audioLenSeconds, ref pAudioBuffer);
-            if (fpBufferLen <= 0)
+            switch (fpBufferLen)
+            {
+                case -1:
+                    throw new Exception(filePath + " is not readable!");
+                case -2:
+                    throw new Exception(filePath + " can not decode audio data!");
+            }
+            if (fpBufferLen == 0)
             {
                 return audioBuffer;
             }
@@ -175,6 +189,7 @@ namespace ACRCloudRecognitionTest
             audioBuffer = new byte[fpBufferLen];
             Marshal.Copy(pAudioBuffer, audioBuffer, 0, fpBufferLen);
             acr_free(pAudioBuffer);
+
             return audioBuffer;
         }
 
@@ -195,17 +210,21 @@ namespace ACRCloudRecognitionTest
         public byte[] DecodeAudioByFileBuffer(byte[] fileBuffer, int fileBufferLen, int startTimeSeconds, int audioLenSeconds)
         {
             byte[] audioBuffer = null;
-            if (fileBuffer == null || fileBufferLen <= 0)
-            {
-                return audioBuffer;
-            }
+
             if (fileBufferLen > fileBuffer.Length)
             {
                 fileBufferLen = fileBuffer.Length;
             }
             IntPtr pAudioBuffer = IntPtr.Zero;
             int fpBufferLen = decode_audio_by_filebuffer(fileBuffer, fileBufferLen, startTimeSeconds, audioLenSeconds, ref pAudioBuffer);
-            if (fpBufferLen <= 0)
+            switch (fpBufferLen)
+            {
+                case -1:
+                    throw new Exception("fileBuffer is not audio/video data!");
+                case -2:
+                    throw new Exception("fileBuffer can not decode audio data!");
+            }
+            if (fpBufferLen == 0)
             {
                 return audioBuffer;
             }
@@ -214,6 +233,22 @@ namespace ACRCloudRecognitionTest
             Marshal.Copy(pAudioBuffer, audioBuffer, 0, fpBufferLen);
             acr_free(pAudioBuffer);
             return audioBuffer;
+        }
+
+        /**
+          *
+          *  get duration from file buffer of (Audio/Video file)
+          *          Audio: mp3, wav, m4a, flac, aac, amr, ape, ogg ...
+          *          Video: mp4, mkv, wmv, flv, ts, avi ...
+          *
+          *  @param filePath query file path 
+          *  
+          *  @return duration ms
+          *
+          **/
+        public int GetDurationMillisecondByFile(string filePath)
+        {
+            return get_duration_ms_by_file(filePath);
         }
 
         [DllImport("libacrcloud_extr_tool.dll")]
@@ -229,14 +264,25 @@ namespace ACRCloudRecognitionTest
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern void acr_free(IntPtr buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
-        private static extern void acr_set_debug();
+        private static extern int get_duration_ms_by_file(string file_path);
+        [DllImport("libacrcloud_extr_tool.dll")]
+        public static extern void acr_set_debug();
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern void acr_init();
     }
 
+    public class ACRCloudStatusCode
+    {
+        public static string HTTP_ERROR = "{\"status\":{\"msg\":\"Http Error\", \"code\":3000}}";
+        public static string NO_RESULT = "{\"status\":{\"msg\":\"No Result\", \"code\":1001}}";
+        public static string GEN_FP_ERROR = "{\"status\":{\"msg\":\"Gen Fingerprint Error\", \"code\":2004}}";
+        public static string RECORD_ERROR = "{\"status\":{\"msg\":\"Record Error\", \"code\":2000}}";
+        public static string JSON_ERROR = "{\"status\":{\"msg\":\"json error\", \"code\":2002}}";
+    }
+
     class ACRCloudRecognizer
     {
-        private string host = "ap-southeast-1.api.acrcloud.com";
+        private string host = "";
         private string accessKey = "";
         private string accessSecret = "";
         private int timeout = 5 * 1000; // ms
@@ -279,7 +325,7 @@ namespace ACRCloudRecognitionTest
             byte[] fp = this.acrTool.CreateFingerprint(wavAudioBuffer, wavAudioBufferLen, false);
             if (fp == null)
             {
-                return "";
+                return ACRCloudStatusCode.NO_RESULT;
             }
             return this.DoRecognize(fp);
         }
@@ -298,11 +344,20 @@ namespace ACRCloudRecognitionTest
           **/
         public String RecognizeByFile(string filePath, int startSeconds)
         {
-            byte[] fp = this.acrTool.CreateFingerprintByFile(filePath, startSeconds, 12, false);
-            Debug.WriteLine(fp.Length);
+            byte[] fp = null;
+            try
+            {
+                fp = this.acrTool.CreateFingerprintByFile(filePath, startSeconds, 12, false);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return ACRCloudStatusCode.GEN_FP_ERROR;
+            }
+
             if (fp == null)
             {
-                return "";
+                return ACRCloudStatusCode.NO_RESULT;
             }
             return this.DoRecognize(fp);
         }
@@ -322,10 +377,19 @@ namespace ACRCloudRecognitionTest
           **/
         public String RecognizeByFileBuffer(byte[] fileBuffer, int fileBufferLen, int startSeconds)
         {
-            byte[] fp = this.acrTool.CreateFingerprintByFileBuffer(fileBuffer, fileBufferLen, startSeconds, 12, false);
+            byte[] fp = null;
+            try
+            {
+                fp = this.acrTool.CreateFingerprintByFileBuffer(fileBuffer, fileBufferLen, startSeconds, 12, false);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return ACRCloudStatusCode.GEN_FP_ERROR;
+            }
             if (fp == null)
             {
-                return "";
+                return ACRCloudStatusCode.NO_RESULT;
             }
             return this.DoRecognize(fp);
         }
@@ -394,10 +458,12 @@ namespace ACRCloudRecognitionTest
             catch (WebException e)
             {
                 Console.WriteLine("timeout:\n" + e.ToString());
+                result = ACRCloudStatusCode.HTTP_ERROR;
             }
             catch (Exception e)
             {
                 Console.WriteLine("other excption:" + e.ToString());
+                result = ACRCloudStatusCode.HTTP_ERROR;
             }
             finally
             {
@@ -496,8 +562,8 @@ namespace ACRCloudRecognitionTest
 
             ACRCloudRecognizer re = new ACRCloudRecognizer(config);
 
-            // It will skip 80 seconds from the beginning of test.mp3.
-            string result = re.RecognizeByFile("test.mp3", 80);
+            // It will skip 0 seconds from the beginning of test.mp3.
+            string result = re.RecognizeByFile("test.mp3", 0);
             Console.WriteLine(result);
 
             /**
@@ -513,8 +579,8 @@ namespace ACRCloudRecognitionTest
                 using (BinaryReader reader = new BinaryReader(fs))
                 {
                     byte[] datas = reader.ReadBytes((int)fs.Length);
-                    // It will skip 80 seconds from the beginning of datas.
-                    result = re.RecognizeByFileBuffer(datas, datas.Length, 80);
+                    // It will skip 0 seconds from the beginning of datas.
+                    result = re.RecognizeByFileBuffer(datas, datas.Length, 0);
                     Console.WriteLine(result);
                 }
             }

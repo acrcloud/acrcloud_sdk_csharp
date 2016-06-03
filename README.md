@@ -151,6 +151,19 @@ class ACRCloudExtrTool {
       *  @return result audio data(formatter:RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz)
       *
       **/
+
+  /**
+    *
+    *  get duration from file buffer of (Audio/Video file)
+    *          Audio: mp3, wav, m4a, flac, aac, amr, ape, ogg ...
+    *          Video: mp4, mkv, wmv, flv, ts, avi ...
+    *
+    *  @param filePath query file path 
+    *  
+    *  @return duration ms
+    *
+    **/
+   public int GetDurationMillisecondByFile(string filePath)
   }
   
 ```

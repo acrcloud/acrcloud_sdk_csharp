@@ -29,8 +29,21 @@ namespace ACRCloudRecognitionTest
 {
     class ACRCloudExtrTool
     {
+        private int filter_energy_min_ = 0;
+        private int silence_energy_threshold_ = 500;
+        private float silence_rate_threshold_ = 0.9f;
+
         public ACRCloudExtrTool()
         {
+            acr_init();
+        }
+
+        public ACRCloudExtrTool(int filter_energy_min, int silence_energy_threshold, float silence_rate_threshold)
+        {
+            this.filter_energy_min_ = filter_energy_min;
+            this.silence_energy_threshold_ = silence_energy_threshold;
+            this.silence_rate_threshold_ = silence_rate_threshold;
+
             acr_init();
         }
 
@@ -58,7 +71,7 @@ namespace ACRCloudRecognitionTest
             }
             byte tIsDB = (isDB) ? (byte)1 : (byte)0;
             IntPtr pFpBuffer = IntPtr.Zero;
-            int fpBufferLen = create_fingerprint(pcmBuffer, pcmBufferLen, tIsDB, ref pFpBuffer);
+            int fpBufferLen = create_fingerprint(pcmBuffer, pcmBufferLen, tIsDB, this.filter_energy_min_, this.silence_energy_threshold_, this.silence_rate_threshold_, ref pFpBuffer);
             if (fpBufferLen <= 0)
             {
                 return fpBuffer;
@@ -127,7 +140,7 @@ namespace ACRCloudRecognitionTest
 
             byte tIsDB = (isDB) ? (byte)1 : (byte)0;
             IntPtr pFpBuffer = IntPtr.Zero;
-            int fpBufferLen = create_fingerprint_by_file(filePath, startTimeSeconds, audioLenSeconds, tIsDB, ref pFpBuffer);
+            int fpBufferLen = create_fingerprint_by_file(filePath, startTimeSeconds, audioLenSeconds, tIsDB, this.filter_energy_min_, this.silence_energy_threshold_, this.silence_rate_threshold_, ref pFpBuffer);
             switch (fpBufferLen)
             {
                 case -1:
@@ -210,7 +223,7 @@ namespace ACRCloudRecognitionTest
 
             byte tIsDB = (isDB) ? (byte)1 : (byte)0;
             IntPtr pFpBuffer = IntPtr.Zero;
-            int fpBufferLen = create_fingerprint_by_filebuffer(fileBuffer, fileBufferLen, startTimeSeconds, audioLenSeconds, tIsDB, ref pFpBuffer);
+            int fpBufferLen = create_fingerprint_by_filebuffer(fileBuffer, fileBufferLen, startTimeSeconds, audioLenSeconds, tIsDB, this.filter_energy_min_, this.silence_energy_threshold_, this.silence_rate_threshold_, ref pFpBuffer);
             switch (fpBufferLen)
             {
                 case -1:
@@ -370,15 +383,15 @@ namespace ACRCloudRecognitionTest
         }
 
         [DllImport("libacrcloud_extr_tool.dll")]
-        private static extern int create_fingerprint(byte[] pcm_buffer, int pcm_buffer_len, byte is_db_fingerprint, ref IntPtr fps_buffer);
+        private static extern int create_fingerprint(byte[] pcm_buffer, int pcm_buffer_len, byte is_db_fingerprint, int filter_energy_min, int silence_energy_threshold, float silence_rate_threshold, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern int create_humming_fingerprint(byte[] pcm_buffer, int pcm_buffer_len, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
-        private static extern int create_fingerprint_by_file(string file_path, int start_time_seconds, int audio_len_seconds, byte is_db_fingerprint, ref IntPtr fps_buffer);
+        private static extern int create_fingerprint_by_file(string file_path, int start_time_seconds, int audio_len_seconds, byte is_db_fingerprint, int filter_energy_min, int silence_energy_threshold, float silence_rate_threshold, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern int create_humming_fingerprint_by_file(string file_path, int start_time_seconds, int audio_len_seconds, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
-        private static extern int create_fingerprint_by_filebuffer(byte[] file_buffer, int file_buffer_len, int start_time_seconds, int audio_len_seconds, byte is_db_fingerprint, ref IntPtr fps_buffer);
+        private static extern int create_fingerprint_by_filebuffer(byte[] file_buffer, int file_buffer_len, int start_time_seconds, int audio_len_seconds, byte is_db_fingerprint, int filter_energy_min, int silence_energy_threshold, float silence_rate_threshold, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
         private static extern int create_humming_fingerprint_by_filebuffer(byte[] file_buffer, int file_buffer_len, int start_time_seconds, int audio_len_seconds, ref IntPtr fps_buffer);
         [DllImport("libacrcloud_extr_tool.dll")]
@@ -403,6 +416,7 @@ namespace ACRCloudRecognitionTest
         public static string DECODE_AUDIO_ERROR = "{\"status\":{\"msg\":\"Can not decode audio data\", \"code\":2004}}";
         public static string RECORD_ERROR = "{\"status\":{\"msg\":\"Record Error\", \"code\":2000}}";
         public static string JSON_ERROR = "{\"status\":{\"msg\":\"json error\", \"code\":2002}}";
+        public static string MUTE_ERROR = "{\"status\":{\"msg\":\"May Be Mute\", \"code\":2006}}";
     }
 
     class ACRCloudRecognizer
@@ -416,8 +430,11 @@ namespace ACRCloudRecognitionTest
         private int timeout = 5 * 1000; // ms
         private RECOGNIZER_TYPE rec_type = RECOGNIZER_TYPE.acr_rec_type_audio;
         private bool debug = false;
+        private int filter_energy_min = 0;
+        private int silence_energy_threshold = 500;
+        private float silence_rate_threshold = 0.9f;
 
-        private ACRCloudExtrTool acrTool = new ACRCloudExtrTool();
+        private ACRCloudExtrTool acrTool = null;
 
         public ACRCloudRecognizer(IDictionary<string, Object> config)
         {
@@ -441,6 +458,20 @@ namespace ACRCloudRecognitionTest
             {
                 this.rec_type = (RECOGNIZER_TYPE)config["rec_type"];
             }
+            if (config.ContainsKey("filter_energy_min"))
+            {
+                this.filter_energy_min = (int)config["filter_energy_min"];
+            }
+            if (config.ContainsKey("silence_energy_threshold"))
+            {
+                this.silence_energy_threshold = (int)config["silence_energy_threshold"];
+            }
+            if (config.ContainsKey("silence_rate_threshold"))
+            {
+                this.silence_rate_threshold = (float)config["silence_rate_threshold"];
+            }
+
+            this.acrTool = new ACRCloudExtrTool(this.filter_energy_min, this.silence_energy_threshold, this.silence_rate_threshold);
         }
 
         /**
@@ -476,6 +507,11 @@ namespace ACRCloudRecognitionTest
                     break;
                 default:
                     return ACRCloudStatusCode.NO_RESULT;
+            }
+
+            if (ext_fp == null && hum_fp == null)
+            {
+                return ACRCloudStatusCode.MUTE_ERROR;
             }
 
             return this.DoRecognize(query_data);
@@ -528,7 +564,7 @@ namespace ACRCloudRecognitionTest
 
             if (ext_fp == null && hum_fp == null)
             {
-                return ACRCloudStatusCode.NO_RESULT;
+                return ACRCloudStatusCode.MUTE_ERROR;
             }
             return this.DoRecognize(query_data);
         }
@@ -581,7 +617,7 @@ namespace ACRCloudRecognitionTest
 
             if (ext_fp == null && hum_fp == null)
             {
-                return ACRCloudStatusCode.NO_RESULT;
+                return ACRCloudStatusCode.MUTE_ERROR;
             }
 
             return this.DoRecognize(query_data);
@@ -760,10 +796,11 @@ namespace ACRCloudRecognitionTest
         {
             var config = new Dictionary<string, object>();
             // Replace "XXXXXXXX" below with your project's host, access_key and access_secret
-            config.Add("host", "XXXXXXX");
+            config.Add("host", "XXXXXXXX");
             config.Add("access_key", "XXXXXXXX");
             config.Add("access_secret", "XXXXXXXX");
             config.Add("timeout", 10); // seconds
+            config.Add("rec_type", ACRCloudRecognizer.RECOGNIZER_TYPE.acr_rec_type_audio);
 
             /**
               *   
@@ -820,3 +857,4 @@ namespace ACRCloudRecognitionTest
         }
     }
 }
+

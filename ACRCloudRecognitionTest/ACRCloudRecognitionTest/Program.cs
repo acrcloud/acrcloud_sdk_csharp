@@ -29,9 +29,9 @@ namespace ACRCloudRecognitionTest
 {
     class ACRCloudExtrTool
     {
-        private int filter_energy_min_ = 0;
-        private int silence_energy_threshold_ = 500;
-        private float silence_rate_threshold_ = 0.9f;
+        private int filter_energy_min_ = 50;
+        private int silence_energy_threshold_ = 100;
+        private float silence_rate_threshold_ = 0.99f;
 
         public ACRCloudExtrTool()
         {
@@ -430,9 +430,9 @@ namespace ACRCloudRecognitionTest
         private int timeout = 5 * 1000; // ms
         private RECOGNIZER_TYPE rec_type = RECOGNIZER_TYPE.acr_rec_type_audio;
         private bool debug = false;
-        private int filter_energy_min = 0;
-        private int silence_energy_threshold = 500;
-        private float silence_rate_threshold = 0.9f;
+        private int filter_energy_min = 50;
+        private int silence_energy_threshold = 100;
+        private float silence_rate_threshold = 0.99f;
 
         private ACRCloudExtrTool acrTool = null;
 

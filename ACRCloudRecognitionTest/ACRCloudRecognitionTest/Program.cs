@@ -9,7 +9,7 @@ This module can recognize ACRCloud by most of audio/video file.
         Audio: mp3, wav, m4a, flac, aac, amr, ape, ogg ...
         Video: mp4, mkv, wmv, flv, ts, avi ...
   
- */
+*/
 
 using System;
 using System.Collections.Generic;
@@ -431,7 +431,7 @@ namespace ACRCloudRecognitionTest
         private RECOGNIZER_TYPE rec_type = RECOGNIZER_TYPE.acr_rec_type_audio;
         private bool debug = false;
         private int filter_energy_min = 50;
-        private int silence_energy_threshold = 100;
+        private int silence_energy_threshold = 50;
         private float silence_rate_threshold = 0.99f;
 
         private ACRCloudExtrTool acrTool = null;
@@ -566,6 +566,36 @@ namespace ACRCloudRecognitionTest
             {
                 return ACRCloudStatusCode.MUTE_ERROR;
             }
+            return this.DoRecognize(query_data);
+        }
+
+        /**
+          *
+          *  recognize by file path of (Audio/Video file)
+          *          Audio: mp3, wav, m4a, flac, aac, amr, ape, ogg ...
+          *          Video: mp4, mkv, wmv, flv, ts, avi ...
+          *
+          *  @param filePath query file path
+          *  @param startSeconds skip (startSeconds) seconds from from the beginning of (filePath)
+          *  
+          *  @return result 
+          *
+          **/
+        public String RecognizeAudioByFile(string filePath, int startSeconds, int audioLenSeconds=20)
+        {
+            byte[] pcm_buffer = null;
+            IDictionary<string, Object> query_data = new Dictionary<string, Object>();
+            try
+            {
+                pcm_buffer = this.acrTool.DecodeAudioByFile(filePath, startSeconds, audioLenSeconds);
+                query_data.Add("audio_pcm", pcm_buffer);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return ACRCloudStatusCode.DECODE_AUDIO_ERROR;
+            }
+
             return this.DoRecognize(query_data);
         }
 
@@ -744,6 +774,7 @@ namespace ACRCloudRecognitionTest
         {
             byte[] ext_fp = null;
             byte[] hum_fp = null;
+            byte[] audio_pcm = null;
             string method = "POST";
             string httpURL = "/v1/identify";
             string dataType = "fingerprint";
@@ -757,12 +788,27 @@ namespace ACRCloudRecognitionTest
 
             var dict = new Dictionary<string, object>();
             dict.Add("access_key", this.accessKey);
+            dict.Add("data_type", dataType);
+
             if (query_data.ContainsKey("ext_fp")) {
                 ext_fp = (byte[])query_data["ext_fp"];
                 if (ext_fp != null)
                 {
                     dict.Add("sample_bytes", ext_fp.Length.ToString());
                     dict.Add("sample", ext_fp);
+                }
+            }
+            if (query_data.ContainsKey("audio_pcm"))
+            {
+                audio_pcm = (byte[])query_data["audio_pcm"];
+                if (audio_pcm != null)
+                {
+                    dict.Add("sample_bytes", audio_pcm.Length.ToString());
+                    dict.Add("sample", audio_pcm);
+                    dataType = "audio";
+                    dict["data_type"] = dataType;
+                    sigStr = method + "\n" + httpURL + "\n" + accessKey + "\n" + dataType + "\n" + sigVersion + "\n" + timestamp;
+                    signature = EncryptByHMACSHA1(sigStr, this.accessSecret);
                 }
             }
             if (query_data.ContainsKey("hum_fp"))
@@ -774,13 +820,12 @@ namespace ACRCloudRecognitionTest
                     dict.Add("sample_hum", hum_fp);
                 }
             }
-            if (ext_fp == null && hum_fp == null)
+            if (ext_fp == null && hum_fp == null && audio_pcm == null)
             {
                 return ACRCloudStatusCode.NO_RESULT;
             }
             dict.Add("timestamp", timestamp);
             dict.Add("signature", signature);
-            dict.Add("data_type", dataType);
             dict.Add("signature_version", sigVersion);
 
             string res = PostHttp(reqURL, dict);

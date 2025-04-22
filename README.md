@@ -20,9 +20,7 @@ Follow one of the tutorials to create a project and get your host, access_key an
  * [Recognize Live Channels and Custom Content](https://docs.acrcloud.com/tutorials/recognize-tv-channels-and-custom-content)
 
 ## Windows Runtime Library 
-**If you run the SDK on Windows, you must install this library.**<br>
-X86: [download and install Library(vcredist_x86.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=5555)<br>
-x64: [download and install Library(vcredist_x64.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=14632)
+**If you run the SDK on Windows, you must install this library [vcredist_x64.exe|vcredist_x86.exe].**<br>
 
 ## Note
 1. You must not modify package name "com.acrcloud.utils".<br>
